@@ -4,7 +4,7 @@
 
 ---
 
-##  Features
+## Features
 
 -  Predict savings using **Linear Regression**
 -  Analyze spending patterns using **KMeans Clustering**
@@ -14,7 +14,7 @@
 
 ---
 
-##  Tech Stack
+## Tech Stack
 
 - Python 3
 - Pandas
@@ -24,7 +24,7 @@
 
 ---
 
-## 📊 Sample Dataset
+## Sample Dataset
 
 The dataset (`expenses.csv`) includes:
 
