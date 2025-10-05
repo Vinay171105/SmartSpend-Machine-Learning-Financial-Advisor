@@ -1,20 +1,20 @@
-# 💰 SmartSpend – Machine Learning Financial Advisor
+#  SmartSpend – Machine Learning Financial Advisor
 
 **SmartSpend** is a machine learning-powered financial advisor that helps users predict monthly savings, understand spending habits, and identify opportunities to save more — all in an interactive dashboard.
 
 ---
 
-## 🚀 Features
+##  Features
 
-- 🔍 Predict savings using **Linear Regression**
-- 📈 Analyze spending patterns using **KMeans Clustering**
-- 🧠 Real-time predictions in an interactive **Streamlit app**
-- 📊 Beautiful visualizations of income vs. expenses
-- 💡 Personalized, data-driven financial insights
+-  Predict savings using **Linear Regression**
+-  Analyze spending patterns using **KMeans Clustering**
+-  Real-time predictions in an interactive **Streamlit app**
+-  Beautiful visualizations of income vs. expenses
+-  Personalized, data-driven financial insights
 
 ---
 
-## 🧰 Tech Stack
+##  Tech Stack
 
 - Python 3
 - Pandas
@@ -35,5 +35,5 @@ The dataset (`expenses.csv`) includes:
 
 ---
 
-## 📁 Folder Structure
+
 
