@@ -8,7 +8,7 @@ Enter a monthly income and expenses to compare a Linear Regression estimate with
 
 ## Features
 
-- Polished responsive dashboard with a resettable monthly-plan sidebar
+- Polished dark-mode dashboard with a resettable monthly-plan sidebar
 - Budget health metrics, savings-rate progress, and category-breakdown charts
 - Spending comparison against the included sample data
 - Interactive savings-goal timeline and what-if expense-reduction planner

@@ -94,19 +94,26 @@ def inject_styles() -> None:
     st.markdown(
         """
         <style>
-            .stApp { background: #f7f9fc; }
-            [data-testid="stSidebar"] { background: #102a43; }
-            [data-testid="stSidebar"] * { color: #f4f8fb; }
-            [data-testid="stSidebar"] input { color: #102a43; background: #ffffff; }
-            [data-testid="stSidebar"] button { color: #102a43; background: #d9eafd; border: 0; }
+            [data-testid="stSidebar"] { background: #0b1f33; border-right: 1px solid #24425e; }
+            [data-testid="stSidebar"] * { color: #e7f0fa; }
+            [data-testid="stSidebar"] input {
+                color: #f8fbff !important; background: #152e48 !important; border-color: #3b5f82 !important;
+            }
+            [data-testid="stSidebar"] button {
+                color: #e7f0fa !important; background: #1c5870 !important; border: 1px solid #3cd2c8 !important;
+            }
+            [data-testid="stSidebar"] button:hover { background: #26738a !important; }
             .block-container { max-width: 1250px; padding-top: 2.2rem; padding-bottom: 3rem; }
-            .hero { background: linear-gradient(120deg, #102a43, #147d92); border-radius: 18px;
+            .hero { background: linear-gradient(120deg, #102a43, #147d92); border: 1px solid #2d6d7d; border-radius: 18px;
                     color: #ffffff; padding: 2rem 2.1rem; margin-bottom: 1.3rem; }
             .hero h1 { color: #ffffff; margin: 0 0 .35rem; font-size: 2.25rem; }
             .hero p { color: #d9edf2; margin: 0; font-size: 1.05rem; }
-            [data-testid="stMetric"] { background: #ffffff; border: 1px solid #e3eaf2;
+            [data-testid="stMetric"] { background: #12253a; border: 1px solid #2d4965;
                                        border-radius: 14px; padding: .85rem; }
-            [data-testid="stTabs"] button { font-weight: 600; }
+            [data-testid="stMetricLabel"] { color: #b7c9dc !important; }
+            [data-testid="stMetricValue"] { color: #f8fbff !important; }
+            [data-testid="stTabs"] button { color: #b7c9dc !important; font-weight: 600; }
+            [data-testid="stTabs"] button[aria-selected="true"] { color: #3cd2c8 !important; }
         </style>
         """,
         unsafe_allow_html=True,
