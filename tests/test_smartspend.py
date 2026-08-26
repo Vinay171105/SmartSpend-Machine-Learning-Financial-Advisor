@@ -4,14 +4,17 @@ import math
 
 import pytest
 
-from savings_goal_predictor import estimate_months_to_goal
 from smartspend_core import (
     EXPENSE_COLUMNS,
     FEATURE_COLUMNS,
     REQUIRED_COLUMNS,
     DataValidationError,
+    build_budget_summary,
+    build_expense_breakdown,
     calculate_disposable_savings,
     calculate_savings_goal,
+    compare_to_sample,
+    estimate_months_to_goal,
     load_expenses,
     predict_next_month_expenses,
     predict_savings,
@@ -92,6 +95,39 @@ def test_zero_and_negative_disposable_savings():
 def test_high_income_and_high_expenses_are_handled():
     assert calculate_disposable_savings(1_000_000, 10_000, 10_000, 10_000, 10_000, 10_000) == 950_000
     assert calculate_disposable_savings(50_000, 20_000, 10_000, 10_000, 10_000, 10_000) == -10_000
+
+
+def test_budget_summary_and_expense_breakdown():
+    inputs = dict(
+        income=50_000,
+        food=7_000,
+        transportation=2_500,
+        entertainment=2_000,
+        utilities=3_500,
+        shopping=4_000,
+    )
+    summary = build_budget_summary(**inputs)
+    breakdown = build_expense_breakdown(**inputs)
+    assert summary.total_expenses == 19_000
+    assert summary.disposable_savings == 31_000
+    assert summary.largest_expense_category == "food"
+    assert breakdown["amount"].sum() == 19_000
+    assert breakdown["share_of_expenses"].sum() == pytest.approx(100)
+
+
+def test_sample_comparison_uses_dataset_averages(expenses):
+    comparison = compare_to_sample(
+        expenses,
+        income=50_000,
+        food=7_000,
+        transportation=2_500,
+        entertainment=2_000,
+        utilities=3_500,
+        shopping=4_000,
+    )
+    food = comparison.loc[comparison["category"] == "Food"].iloc[0]
+    assert food["sample_average"] == pytest.approx(expenses["food"].mean())
+    assert food["difference"] == pytest.approx(7_000 - expenses["food"].mean())
 
 
 def test_savings_goal_calculation_and_goal_projection():

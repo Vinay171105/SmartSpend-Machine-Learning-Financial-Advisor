@@ -1,15 +1,6 @@
 """Estimate months to a savings goal using the validated SmartSpend dataset."""
 
-from smartspend_core import DataValidationError, predict_savings, train_savings_model
-
-
-def estimate_months_to_goal(savings_goal: float, monthly_savings: float) -> float | None:
-    """Return months required, or ``None`` when the goal is not currently fundable."""
-    if savings_goal <= 0:
-        raise DataValidationError("Savings goal must be greater than zero.")
-    if monthly_savings <= 0:
-        return None
-    return float(savings_goal / monthly_savings)
+from smartspend_core import estimate_months_to_goal, predict_savings, train_savings_model
 
 
 def predict_months_to_goal(

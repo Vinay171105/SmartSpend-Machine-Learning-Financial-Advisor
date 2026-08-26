@@ -45,6 +45,18 @@ class TrainingResult:
     test_rows: int
 
 
+@dataclass(frozen=True)
+class BudgetSummary:
+    """A validated snapshot of a user's monthly budget."""
+
+    total_expenses: float
+    disposable_savings: float
+    savings_rate: float
+    expense_ratio: float
+    largest_expense_category: str
+    largest_expense_amount: float
+
+
 def calculate_disposable_savings(
     income: float,
     food: float,
@@ -64,6 +76,55 @@ def calculate_disposable_savings(
     }
     validated = _validate_financial_inputs(values)
     return validated["income"] - sum(validated[column] for column in EXPENSE_COLUMNS)
+
+
+def build_budget_summary(**financial_inputs: float) -> BudgetSummary:
+    """Calculate budget health indicators for one set of monthly inputs."""
+    validated = _validate_financial_inputs(financial_inputs)
+    total_expenses = sum(validated[column] for column in EXPENSE_COLUMNS)
+    disposable_savings = validated["income"] - total_expenses
+    income = validated["income"]
+    largest_category = max(EXPENSE_COLUMNS, key=lambda column: validated[column])
+    return BudgetSummary(
+        total_expenses=total_expenses,
+        disposable_savings=disposable_savings,
+        savings_rate=(disposable_savings / income * 100) if income else 0.0,
+        expense_ratio=(total_expenses / income * 100) if income else 0.0,
+        largest_expense_category=largest_category,
+        largest_expense_amount=validated[largest_category],
+    )
+
+
+def build_expense_breakdown(**financial_inputs: float) -> pd.DataFrame:
+    """Return category amounts and shares of total spending for charts and tables."""
+    validated = _validate_financial_inputs(financial_inputs)
+    total_expenses = sum(validated[column] for column in EXPENSE_COLUMNS)
+    rows = [
+        {
+            "category": column.replace("_", " ").title(),
+            "amount": validated[column],
+            "share_of_expenses": (validated[column] / total_expenses * 100) if total_expenses else 0.0,
+        }
+        for column in EXPENSE_COLUMNS
+    ]
+    return pd.DataFrame(rows)
+
+
+def compare_to_sample(data: pd.DataFrame, **financial_inputs: float) -> pd.DataFrame:
+    """Compare a user's category spending with the bundled dataset averages."""
+    validated_data = validate_expenses(data)
+    user_values = _validate_financial_inputs(financial_inputs)
+    sample_means = validated_data.loc[:, list(EXPENSE_COLUMNS)].mean()
+    rows = [
+        {
+            "category": column.replace("_", " ").title(),
+            "your_spending": user_values[column],
+            "sample_average": float(sample_means[column]),
+            "difference": user_values[column] - float(sample_means[column]),
+        }
+        for column in EXPENSE_COLUMNS
+    ]
+    return pd.DataFrame(rows)
 
 
 def load_expenses(path: str | Path | None = None) -> pd.DataFrame:
@@ -159,6 +220,17 @@ def calculate_savings_goal(
     if not 0 <= target_rate <= 1:
         raise DataValidationError("Target rate must be between 0 and 1.")
     return float(min(income * target_rate, max(disposable_savings, 0)))
+
+
+def estimate_months_to_goal(savings_goal: float, monthly_savings: float) -> float | None:
+    """Return months required to reach a goal, or ``None`` if savings are not positive."""
+    if not np.isfinite(savings_goal) or savings_goal <= 0:
+        raise DataValidationError("Savings goal must be a positive finite number.")
+    if not np.isfinite(monthly_savings):
+        raise DataValidationError("Monthly savings must be a finite number.")
+    if monthly_savings <= 0:
+        return None
+    return float(savings_goal / monthly_savings)
 
 
 def savings_recommendation(income: float, disposable_savings: float) -> str:
