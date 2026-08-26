@@ -1,41 +1,47 @@
-# Savings Goal Predictor
-# This script predicts how many months are needed to reach a savings goal based on average monthly expenses
-import pandas as pd
-from sklearn.linear_model import LinearRegression
-import numpy as np
+"""Estimate months to a savings goal using the validated SmartSpend dataset."""
 
-# ---- Step 1: Load dataset ----
-data = pd.read_csv('monthly_expenses.csv') 
-data['Savings'] = data['Income'] - (
-    data['Food'] + data['Transportation'] + data['Entertainment'] +
-    data['Utilities'] + data['Shopping']
-)
+from smartspend_core import DataValidationError, predict_savings, train_savings_model
 
-# ---- Step 2: Train regression model to predict savings per month ----
-X = data[['Income', 'Food', 'Transportation', 'Entertainment', 'Utilities', 'Shopping']]
-y = data['Savings']
 
-model = LinearRegression()
-model.fit(X, y)
-
-# ---- Step 3: Predict how many months are needed to reach a savings goal ----
-def predict_months_to_goal(savings_goal, avg_income, avg_food, avg_transport, avg_ent, avg_util, avg_shop):
-    """Predict how many months are needed to reach the given savings goal."""
-    monthly_savings = model.predict([[avg_income, avg_food, avg_transport, avg_ent, avg_util, avg_shop]])[0]
+def estimate_months_to_goal(savings_goal: float, monthly_savings: float) -> float | None:
+    """Return months required, or ``None`` when the goal is not currently fundable."""
+    if savings_goal <= 0:
+        raise DataValidationError("Savings goal must be greater than zero.")
     if monthly_savings <= 0:
-        return "Your expenses exceed your income. Adjust spending to save."
-    months_needed = savings_goal / monthly_savings
-    return f"To reach ₹{savings_goal}, it will take approximately {months_needed:.1f} months."
+        return None
+    return float(savings_goal / monthly_savings)
 
-# ---- Step 4: Example use ----
-if __name__ == "__main__":
-    result = predict_months_to_goal(
-        savings_goal=50000,
-        avg_income=45000,
-        avg_food=7000,
-        avg_transport=2500,
-        avg_ent=2000,
-        avg_util=3500,
-        avg_shop=4000
+
+def predict_months_to_goal(
+    savings_goal: float,
+    income: float,
+    food: float,
+    transportation: float,
+    entertainment: float,
+    utilities: float,
+    shopping: float,
+) -> float | None:
+    """Predict monthly savings, then estimate the number of months to a goal."""
+    result = train_savings_model()
+    monthly_savings = predict_savings(
+        result.model,
+        income=income,
+        food=food,
+        transportation=transportation,
+        entertainment=entertainment,
+        utilities=utilities,
+        shopping=shopping,
     )
-    print(result)
+    return estimate_months_to_goal(savings_goal, monthly_savings)
+
+
+def main() -> None:
+    months = predict_months_to_goal(50_000, 45_000, 7_000, 2_500, 2_000, 3_500, 4_000)
+    if months is None:
+        print("Your expenses exceed your income. Adjust spending before setting this goal.")
+    else:
+        print(f"A ₹50,000 goal would take approximately {months:.1f} months.")
+
+
+if __name__ == "__main__":
+    main()

@@ -3,4 +3,6 @@ __pycache__/
 *.pyc
 *.pkl
 .env
+.venv/
+savings_goal_recommendations.csv
 
